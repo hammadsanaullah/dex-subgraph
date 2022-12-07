@@ -1,0 +1,67 @@
+specVersion: 0.0.6
+description: Sushiswap
+repository: https://github.com/sushiswap/sushiswap-subgraph
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: mumbai
+    source:
+      address: "0x34e4064ef391ce16b4eb394d506baf14b743491d"
+      abi: Factory
+      startBlock: 29400000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: Factory/Factory.wasm
+      entities: []
+      abis:
+        - name: Factory
+          file: Factory/abi/Factory.json
+        - name: Pair
+          file: Factory/abi/Pair.json
+        - name: ERC20
+          file: Factory/abi/ERC20.json
+        - name: SymbolBytes32
+          file: Factory/abi/ERC20SymbolBytes.json
+        - name: NameBytes32
+          file: Factory/abi/ERC20NameBytes.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: onPairCreated
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: mumbai
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: templates/Pair/Pair.wasm
+      entities: []
+      abis:
+        - name: Factory
+          file: Pair/abi/Factory.json
+        - name: Pair
+          file: Pair/abi/Pair.json
+        - name: ERC20
+          file: Pair/abi/ERC20.json
+        - name: SymbolBytes32
+          file: Pair/abi/ERC20SymbolBytes.json
+        - name: NameBytes32
+          file: Pair/abi/ERC20NameBytes.json
+      eventHandlers:
+        - event: Sync(uint112,uint112)
+          handler: onSync
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: onTransfer
+        - event: Mint(indexed address,uint256,uint256)
+          handler: onMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: onBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: onSwap
